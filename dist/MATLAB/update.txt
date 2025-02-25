@@ -1,0 +1,30 @@
+% Configuración del canal de lectura
+readChannelID = 2855587; % ID del canal de lectura
+readAPIKey = 'SUIFMNCQI7PFDKNU'; % Clave de API de lectura
+
+% Canal de escritura (si necesitas almacenar el resultado)
+writeChannelID = [2855600]; % Reemplaza con tu ID de escritura
+writeAPIKey = '2I85957M9JVMJB0U'; % Clave de API de escritura
+
+%% Leer los últimos 10 valores de temperatura
+tempData = thingSpeakRead(readChannelID, 'Fields', 1, 'NumPoints', 10, 'ReadKey', readAPIKey);
+
+% Verificar si hay suficientes datos
+if length(tempData) >= 10
+    avgTemp = mean(tempData); % Calcular el promedio de los últimos 10 datos
+else
+    avgTemp = NaN; % Si no hay suficientes datos, devuelve NaN
+end
+
+%% Mostrar alerta si la temperatura es mayor a 35°C
+if avgTemp > 35
+    alertMessage = sprintf('⚠️ ¡Alerta! Temperatura alta: %.2f°C', avgTemp);
+    disp(alertMessage); % Muestra el mensaje en la consola
+else
+    disp(sprintf('Temperatura normal: %.2f°C', avgTemp));
+end
+
+%% (Opcional) Escribir el resultado en otro canal de ThingSpeak
+if ~isnan(avgTemp)
+    thingSpeakWrite(writeChannelID, avgTemp, 'WriteKey', writeAPIKey);
+end
